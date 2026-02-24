@@ -1,0 +1,6 @@
+# Environments
+.venv/
+
+# Compiled Python
+__pycache__/
+*.py[cd]

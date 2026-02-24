@@ -1,0 +1,59 @@
+name: Update dprint-py tag mirror
+
+on:
+  schedule:
+    - cron: "0 4 * * *" # Run daily at 04:00 UTC
+  workflow_dispatch: # Allow manual triggering
+
+concurrency:
+  group: update-mirror
+  cancel-in-progress: false
+
+jobs:
+  update-mirror:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Needed to push commits and tags
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Needed to fetch all tags
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Run update script
+        id: update
+        run: |
+          python update_releases.py
+
+      - name: Push changes and tags
+        if: steps.update.outputs.tags != ''
+        run: |
+          git push origin HEAD:${{ github.ref_name }} ${{ steps.update.outputs.tags }}
+
+      - name: Create GitHub Releases
+        if: steps.update.outputs.tags != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAGS: ${{ steps.update.outputs.tags }}
+        run: |
+          set -euo pipefail
+          for tag in $TAGS; do
+            if gh release view "$tag" >/dev/null 2>&1; then
+              echo "Release $tag already exists. Skipping."
+              continue
+            fi
+            gh release create "$tag" \
+              --title "$tag" \
+              --notes "See: https://github.com/dprint/dprint-py/releases/tag/$tag"
+          done

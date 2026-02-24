@@ -1,0 +1,21 @@
+- id: dprint-fmt
+  name: dprint-fmt
+  description: "Run 'dprint fmt' to format code"
+  entry: dprint fmt
+  args: [--allow-no-files]
+  language: python
+  types: [text]
+  # dprint uses concurrency when processing multiple files
+  require_serial: true
+  minimum_pre_commit_version: "2.20.0"
+
+- id: dprint-check
+  name: dprint-check
+  description: "Run 'dprint check' to check code formatting"
+  entry: dprint check
+  args: [--allow-no-files]
+  language: python
+  types: [text]
+  # dprint uses concurrency when processing multiple files
+  require_serial: true
+  minimum_pre_commit_version: "2.20.0"
