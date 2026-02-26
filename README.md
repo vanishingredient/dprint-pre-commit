@@ -19,7 +19,7 @@ Add the following configuration to your `.pre-commit-config.yaml` to enable the 
 ```yaml
 repos:
   - repo: https://github.com/vanishingredient/dprint-pre-commit
-    rev: 0.50.2.0 # Use a dprint-py release version
+    rev: 0.51.0.0 # Use a dprint-py release version
     hooks:
       - id: dprint-fmt
 ```
@@ -29,7 +29,7 @@ To enforce formatting in CI pipelines without altering files, use the `dprint-ch
 ```yaml
 repos:
   - repo: https://github.com/vanishingredient/dprint-pre-commit
-    rev: 0.50.2.0
+    rev: 0.51.0.0
     hooks:
       - id: dprint-check # Fails if files are not properly formatted
 ```
@@ -42,7 +42,7 @@ If you use [prek](https://github.com/j178/prek) (which is currently compatible w
 ```toml
 [[repos]]
 repo = "https://github.com/vanishingredient/dprint-pre-commit"
-rev = "0.50.2.0"
+rev = "0.51.0.0"
 hooks = [
   { id = "dprint-fmt" },
   { id = "dprint-check" },
