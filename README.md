@@ -34,9 +34,32 @@ repos:
       - id: dprint-check # Fails if files are not properly formatted
 ```
 
+> [!WARNING]
+> In sandboxed environments like the hosted `pre-commit.ci` service, network access is blocked
+> during hook execution. Because `dprint` downloads its language plugins on-the-fly at runtime, it
+> will fail to execute in these environments.
+
+Possible workarounds:
+
+1. **Use the official GitHub Action:** Replace the `pre-commit.ci` service with the official
+   [pre-commit GitHub Action](https://github.com/pre-commit/action). This action executes within
+   your own CI workflow, where network requests are permitted.
+
+2. **Commit plugins locally:** Download the required `.wasm` plugin files into your repository and
+   update your `dprint.json` to reference their local file paths instead of URLs. This enables
+   offline execution but increases your repository size.
+
+3. **Disable the hooks for `pre-commit.ci`:** If you still want to use `pre-commit.ci` for other
+   tools but bypass `dprint` checks, you can explicitly configure it to skip the `dprint` hooks in
+   your `.pre-commit-config.yaml`:
+   ```yaml
+   ci:
+     skip: [dprint-fmt, dprint-check]
+   ```
+
 ## Using with prek
 
-If you use [prek](https://github.com/j178/prek) (which is currently compatible with
+If you use [prek](https://github.com/j178/prek) (which is compatible with
 `.pre-commit-config.yaml`), you can also natively define your hooks in `prek.toml`:
 
 ```toml
@@ -45,13 +68,5 @@ repo = "https://github.com/vanishingredient/dprint-pre-commit"
 rev = "0.52.0.0"
 hooks = [
   { id = "dprint-fmt" },
-  { id = "dprint-check" },
 ]
 ```
-
-## Known Limitations
-
-> [!NOTE]
-> In strictly sandboxed environment applications like `pre-commit.ci`, dprint may fail to
-> dynamically download language plugins due to network constraints enforced after the environment is
-> initially built. This limitation is inherent to dprint's on-the-fly plugin architecture.
